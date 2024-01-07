@@ -1,0 +1,28 @@
+.light_inp{
+    background: #F9F9F9;
+}
+.dark_inp{
+    background: #404040;
+    color: #fff;
+}
+.dark_inp::placeholder{
+    color: #6F6F6F;
+}
+.dark_container{
+    border-color: #5E5E5E;
+    p{
+        color: #6F6F6F;
+    }
+}
+.dark_icon{
+    background: #404040;
+    color: #fff;
+}
+.forma{
+    display: flex;
+    width: 100%;
+    border: 1px solid red;
+}
+::-webkit-scrollbar{
+    display: none;
+}

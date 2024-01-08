@@ -14,10 +14,13 @@
     "@emotion/styled": "^11.11.0",
     "@fontsource/glory": "^5.0.18",
     "@mui/material": "^5.15.3",
+    "@reduxjs/toolkit": "^2.0.1",
+    "classnames": "^2.5.1",
     "cleave.js": "^1.6.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^4.12.0",
+    "react-redux": "^9.0.4",
     "react-router-dom": "^6.21.1"
   },
   "devDependencies": {

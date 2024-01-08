@@ -1,18 +1,33 @@
-import { useContext, useState } from "react";
+import  { useContext, useState } from "react";
 import { IoIosArrowBack } from "react-icons/io";
-import { ThemeContext } from "../App";
 import Cleave from 'cleave.js/react';
-
+import { useNavigate } from "react-router-dom";
+import { weekdays } from "../components/weekData/week";
+import { ThemeContext } from "../App";
 
 export default function CreateStore() {
-
-  const [toggled, setToggled] = useState(false);
   const { theme } = useContext(ThemeContext);
-  const handleToggle = (e) =>{
-    e.preventDefault();
-    setToggled(!toggled)
-  }
+  const navigate = useNavigate();
 
+  const handleBack = () => {
+    navigate('/store');
+  };
+
+  const [weekdaysState, setWeekdays] = useState(weekdays);
+
+  const handleToggle = (id) => {
+    setWeekdays((prevWeekdays) => {
+      return prevWeekdays.map((day) => {
+        if (day.id === id) {
+          return {
+            ...day,
+            isTrue: !day.isTrue,
+          };
+        }
+        return day;
+      });
+    });
+  };
 
   return (
     <>
@@ -21,11 +36,12 @@ export default function CreateStore() {
           className={`store__title h-36 flex gap-3 w-full items-center justify-between px-10 border-b-2 ${theme}_container`}
         >
           <div className="flex items-center justify-center gap-2">
-            <span
-              className={`p-2 rounded-[50%] text-blue-500  bg-gray-100 ${theme}_icon`}
+            <button
+              className={`p-2 rounded-[50%] text-blue-500 bg-gray-100 ${theme}_icon`}
+              onClick={handleBack}
             >
               <IoIosArrowBack />
-            </span>
+            </button>
             <h1 className={`text-4xl font-bold`}>Магазин</h1>
           </div>
           <div className="flex gap-6">
@@ -39,7 +55,7 @@ export default function CreateStore() {
             </button>
           </div>
         </div>
-        <form className="flex flex-col h-full w-full overflow-y-scroll">
+        <div className="flex flex-col h-full w-full overflow-y-scroll">
           <div className="flex">
             <div className="w-[30%]">
               <h2 className=" text-2xl font-semibold px-12 py-8">Основные</h2>
@@ -73,16 +89,10 @@ export default function CreateStore() {
                   />
                 </span>
               </div>
-              <div className="flex flex-col gap-4 w-full">
-                <h3 className=" text-base font-semibold">Режим работы</h3>
-                <div
-                  className={`w-[774px] h-14 bg-gray-100 rounded-2xl px-2 py-1] ${theme}_inp flex items-center justify-around gap-6`}
-                >
-                  <b
-                    className={`flex items-center w-40 font-semibold text-base border-r-2 h-full ${theme}_container`}
-                  >
-                    Понедельник
-                  </b>
+
+              {weekdaysState.map(day => (
+                <div key={day.id} className={`w-[774px] h-14 bg-gray-100 rounded-2xl px-2 py-1 ${theme}_inp flex items-center justify-around gap-6`}>
+                  <b className={`flex items-center w-40 font-semibold text-base border-r-2 h-full ${theme}_container`}>{day.name}</b>
                   <span className="flex h-full items-center">
                     <p
                       className={`${theme}_container text-base font-semibold text-gray-400 px-8`}
@@ -93,7 +103,7 @@ export default function CreateStore() {
                       className={`${theme}_inp w-16 h-full px-1 outline-none text-lg`}
                       options={{ time: true, timePattern: ["h", "m"] }}
                       placeholder="XX : XX"
-                      disabled={!toggled}
+                      disabled={!day.isTrue}
                     />
                   </span>
                   <span className="flex h-full items-center">
@@ -106,308 +116,27 @@ export default function CreateStore() {
                       className={`${theme}_inp w-16 h-full px-1 outline-none text-lg`}
                       options={{ time: true, timePattern: ["h", "m"] }}
                       placeholder="XX : XX"
-                      disabled={!toggled}
+                      disabled={!day.isTrue}
                     />
                   </span>
                   <button
                     className={`${
-                      toggled ? "bg-blue-500" : "bg-gray-200"
+                        day.isTrue ? "bg-blue-500" : "bg-gray-200"
                     } relative inline-flex flex-shrink-0 h-7 w-14 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
-                    onClick={handleToggle}
+                    onClick={() => handleToggle(day.id)}
                   >
                     <span
                       className={`${
-                        toggled ? "translate-x-7" : "translate-x-0"
+                        day.isTrue ? "translate-x-7" : "translate-x-0"
                       } inline-block h-6 w-6 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200`}
                     />
                   </button>
                 </div>
-                <div
-                  className={`w-[774px] h-14 bg-gray-100 rounded-2xl px-2 py-1] ${theme}_inp flex items-center justify-around gap-6`}
-                >
-                  <b
-                    className={`flex items-center w-40 font-semibold text-base border-r-2 h-full ${theme}_container`}
-                  >
-                    Вторник
-                  </b>
-                  <span className="flex h-full items-center">
-                    <p
-                      className={`${theme}_container text-base font-semibold text-gray-400 px-8`}
-                    >
-                      Открытие:
-                    </p>
-                    <Cleave
-                      className={`${theme}_inp w-16 h-full px-1 outline-none text-lg`}
-                      options={{ time: true, timePattern: ["h", "m"] }}
-                      placeholder="XX : XX"
-                      disabled={!toggled}
-                    />
-                  </span>
-                  <span className="flex h-full items-center">
-                    <p
-                      className={`${theme}_container text-base font-semibold text-gray-400 px-8`}
-                    >
-                      Закрытие:
-                    </p>
-                    <Cleave
-                      className={`${theme}_inp w-16 h-full px-1 outline-none text-lg`}
-                      options={{ time: true, timePattern: ["h", "m"] }}
-                      placeholder="XX : XX"
-                      disabled={!toggled}
-                    />
-                  </span>
-                  <button
-                    className={`${
-                      toggled ? "bg-blue-500" : "bg-gray-200"
-                    } relative inline-flex flex-shrink-0 h-7 w-14 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
-                    onClick={handleToggle}
-                  >
-                    <span
-                      className={`${
-                        toggled ? "translate-x-7" : "translate-x-0"
-                      } inline-block h-6 w-6 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200`}
-                    />
-                  </button>
-                </div>
-                <div
-                  className={`w-[774px] h-14 bg-gray-100 rounded-2xl px-2 py-1] ${theme}_inp flex items-center justify-around gap-6`}
-                >
-                  <b
-                    className={`flex items-center w-40 font-semibold text-base border-r-2 h-full ${theme}_container`}
-                  >
-                    Среда
-                  </b>
-                  <span className="flex h-full items-center">
-                    <p
-                      className={`${theme}_container text-base font-semibold text-gray-400 px-8`}
-                    >
-                      Открытие:
-                    </p>
-                    <Cleave
-                      className={`${theme}_inp w-16 h-full px-1 outline-none text-lg`}
-                      options={{ time: true, timePattern: ["h", "m"] }}
-                      placeholder="XX : XX"
-                      disabled={!toggled}
-                    />
-                  </span>
-                  <span className="flex h-full items-center">
-                    <p
-                      className={`${theme}_container text-base font-semibold text-gray-400 px-8`}
-                    >
-                      Закрытие:
-                    </p>
-                    <Cleave
-                      className={`${theme}_inp w-16 h-full px-1 outline-none text-lg`}
-                      options={{ time: true, timePattern: ["h", "m"] }}
-                      placeholder="XX : XX"
-                      disabled={!toggled}
-                    />
-                  </span>
-                  <button
-                    className={`${
-                      toggled ? "bg-blue-500" : "bg-gray-200"
-                    } relative inline-flex flex-shrink-0 h-7 w-14 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
-                    onClick={handleToggle}
-                  >
-                    <span
-                      className={`${
-                        toggled ? "translate-x-7" : "translate-x-0"
-                      } inline-block h-6 w-6 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200`}
-                    />
-                  </button>
-                </div>
-                <div
-                  className={`w-[774px] h-14 bg-gray-100 rounded-2xl px-2 py-1] ${theme}_inp flex items-center justify-around gap-6`}
-                >
-                  <b
-                    className={`flex items-center w-40 font-semibold text-base border-r-2 h-full ${theme}_container`}
-                  >
-                    Четверг
-                  </b>
-                  <span className="flex h-full items-center">
-                    <p
-                      className={`${theme}_container text-base font-semibold text-gray-400 px-8`}
-                    >
-                      Открытие:
-                    </p>
-                    <Cleave
-                      className={`${theme}_inp w-16 h-full px-1 outline-none text-lg`}
-                      options={{ time: true, timePattern: ["h", "m"] }}
-                      placeholder="XX : XX"
-                      disabled={!toggled}
-                    />
-                  </span>
-                  <span className="flex h-full items-center">
-                    <p
-                      className={`${theme}_container text-base font-semibold text-gray-400 px-8`}
-                    >
-                      Закрытие:
-                    </p>
-                    <Cleave
-                      className={`${theme}_inp w-16 h-full px-1 outline-none text-lg`}
-                      options={{ time: true, timePattern: ["h", "m"] }}
-                      placeholder="XX : XX"
-                      disabled={!toggled}
-                    />
-                  </span>
-                  <button
-                    className={`${
-                      toggled ? "bg-blue-500" : "bg-gray-200"
-                    } relative inline-flex flex-shrink-0 h-7 w-14 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
-                    onClick={handleToggle}
-                  >
-                    <span
-                      className={`${
-                        toggled ? "translate-x-7" : "translate-x-0"
-                      } inline-block h-6 w-6 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200`}
-                    />
-                  </button>
-                </div>
-                <div
-                  className={`w-[774px] h-14 bg-gray-100 rounded-2xl px-2 py-1] ${theme}_inp flex items-center justify-around gap-6`}
-                >
-                  <b
-                    className={`flex items-center w-40 font-semibold text-base border-r-2 h-full ${theme}_container`}
-                  >
-                    Пятница
-                  </b>
-                  <span className="flex h-full items-center">
-                    <p
-                      className={`${theme}_container text-base font-semibold text-gray-400 px-8`}
-                    >
-                      Открытие:
-                    </p>
-                    <Cleave
-                      className={`${theme}_inp w-16 h-full px-1 outline-none text-lg`}
-                      options={{ time: true, timePattern: ["h", "m"] }}
-                      placeholder="XX : XX"
-                      disabled={!toggled}
-                    />
-                  </span>
-                  <span className="flex h-full items-center">
-                    <p
-                      className={`${theme}_container text-base font-semibold text-gray-400 px-8`}
-                    >
-                      Закрытие:
-                    </p>
-                    <Cleave
-                      className={`${theme}_inp w-16 h-full px-1 outline-none text-lg`}
-                      options={{ time: true, timePattern: ["h", "m"] }}
-                      placeholder="XX : XX"
-                      disabled={!toggled}
-                    />
-                  </span>
-                  <button
-                    className={`${
-                      toggled ? "bg-blue-500" : "bg-gray-200"
-                    } relative inline-flex flex-shrink-0 h-7 w-14 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
-                    onClick={handleToggle}
-                  >
-                    <span
-                      className={`${
-                        toggled ? "translate-x-7" : "translate-x-0"
-                      } inline-block h-6 w-6 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200`}
-                    />
-                  </button>
-                </div>
-                <div
-                  className={`w-[774px] h-14 bg-gray-100 rounded-2xl px-2 py-1] ${theme}_inp flex items-center justify-around gap-6`}
-                >
-                  <b
-                    className={`flex items-center w-40 font-semibold text-base border-r-2 h-full ${theme}_container`}
-                  >
-                    Суббота
-                  </b>
-                  <span className="flex h-full items-center">
-                    <p
-                      className={`${theme}_container text-base font-semibold text-gray-400 px-8`}
-                    >
-                      Открытие:
-                    </p>
-                    <Cleave
-                      className={`${theme}_inp w-16 h-full px-1 outline-none text-lg`}
-                      options={{ time: true, timePattern: ["h", "m"] }}
-                      placeholder="XX : XX"
-                      disabled={!toggled}
-                    />
-                  </span>
-                  <span className="flex h-full items-center">
-                    <p
-                      className={`${theme}_container text-base font-semibold text-gray-400 px-8`}
-                    >
-                      Закрытие:
-                    </p>
-                    <Cleave
-                      className={`${theme}_inp w-16 h-full px-1 outline-none text-lg`}
-                      options={{ time: true, timePattern: ["h", "m"] }}
-                      placeholder="XX : XX"
-                      disabled={!toggled}
-                    />
-                  </span>
-                  <button
-                    className={`${
-                      toggled ? "bg-blue-500" : "bg-gray-200"
-                    } relative inline-flex flex-shrink-0 h-7 w-14 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
-                    onClick={handleToggle}
-                  >
-                    <span
-                      className={`${
-                        toggled ? "translate-x-7" : "translate-x-0"
-                      } inline-block h-6 w-6 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200`}
-                    />
-                  </button>
-                </div>
-                <div
-                  className={`w-[774px] h-14 bg-gray-100 rounded-2xl px-2 py-1] ${theme}_inp flex items-center justify-around gap-6`}
-                >
-                  <b
-                    className={`flex items-center w-40 font-semibold text-base border-r-2 h-full ${theme}_container`}
-                  >
-                    Воскресенье
-                  </b>
-                  <span className="flex h-full items-center">
-                    <p
-                      className={`${theme}_container text-base font-semibold text-gray-400 px-8`}
-                    >
-                      Открытие:
-                    </p>
-                    <Cleave
-                      className={`${theme}_inp w-16 h-full px-1 outline-none text-lg`}
-                      options={{ time: true, timePattern: ["h", "m"] }}
-                      placeholder="XX : XX"
-                      disabled={!toggled}
-                    />
-                  </span>
-                  <span className="flex h-full items-center">
-                    <p
-                      className={`${theme}_container text-base font-semibold text-gray-400 px-8`}
-                    >
-                      Закрытие:
-                    </p>
-                    <Cleave
-                      className={`${theme}_inp w-16 h-full px-1 outline-none text-lg`}
-                      options={{ time: true, timePattern: ["h", "m"] }}
-                      placeholder="XX : XX"
-                      disabled={!toggled}
-                    />
-                  </span>
-                  <button
-                    className={`${
-                      toggled ? "bg-blue-500" : "bg-gray-200"
-                    } relative inline-flex flex-shrink-0 h-7 w-14 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
-                    onClick={handleToggle}
-                  >
-                    <span
-                      className={`${
-                        toggled ? "translate-x-7" : "translate-x-0"
-                      } inline-block h-6 w-6 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200`}
-                    />
-                  </button>
-                </div>
-              </div>
+              ))}
+
             </div>
           </div>
-        </form>
+        </div>
       </div>
     </>
   );

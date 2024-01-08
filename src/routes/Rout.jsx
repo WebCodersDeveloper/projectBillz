@@ -10,6 +10,7 @@ import Currencies from "../pages/Currencies";
 import Product from "../pages/Product";
 import { useContext } from "react";
 import { ThemeContext } from "../App";
+import CreateStore from "../pages/CreateStore";
 export default function Rout() {
   const {theme} = useContext(ThemeContext)
   return (
@@ -23,6 +24,7 @@ export default function Rout() {
         <Route path="/checks" element={<Checks />} />
         <Route path="/currencies" element={<Currencies />} />
         <Route path="/product" element={<Product />} />
+        <Route path="/createstore" element={<CreateStore />} />
       </Routes>
     </div>
   );

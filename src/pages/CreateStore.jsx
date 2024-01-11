@@ -4,29 +4,93 @@ import Cleave from "cleave.js/react";
 import { useNavigate } from "react-router-dom";
 import { weekdays } from "../components/weekData/week";
 import { ThemeContext } from "../App";
-
 import "cleave.js/dist/addons/cleave-phone.uz";
 import { FaPlus } from "react-icons/fa6";
 import { IoCloseCircle } from "react-icons/io5";
 import { countries } from "../components/country/country";
 
+import Check from "../assets/Check.png";
+import { useDispatch, useSelector } from "react-redux";
+import { add } from "../components/createStoreSlicer/storeSlicer";
+
 export default function CreateStore() {
+
+  const newStore = useSelector((state)=> state.addStore);
+  const dispatch = useDispatch();
+
+    const handleSave = () => {
+      dispatch(add({title: title, meter: meter, phone1: phone, phone2: phone2, phone3: phone3, phone4: phone4, facebook: facebook, instagram: instagram, telegram: telegram, website: website, more: enabled, legalName: legalName, region: region, country: country, email: email, creditCard: creditCard, bankname: bank}))
+      console.log(newStore); 
+    }
+
+
   const { theme } = useContext(ThemeContext);
   const navigate = useNavigate();
+
   const [phone, setPhone] = useState("");
   const [phone2, setPhone2] = useState("");
   const [phone3, setPhone3] = useState("");
   const [phone4, setPhone4] = useState("");
+
+  const [facebook, setFacebook] = useState("");
+  const [instagram, setInstagram] = useState("");
+  const [telegram, setTelegram] = useState("");
+  const [website, setWebsite] = useState("");
+  const [legalName, setLegalName] = useState("");
+  const [region, setRegion] = useState("");
+  const [email , setEmail] = useState("");
+  const [bank, setBank] = useState("");
+
+
   const [enabled, setEnabled] = useState(false);
+  const enabledCheck = () =>{
+    setEnabled(!enabled)
+    if (enabled) {
+      console.log('no');
+    }
+    else{
+      console.log('yes');
+    }
+  }
+
+
   const [title, setTitle] = useState("");
-  const [creditCard, setCreditCard] = useState('');
+  const [meter, setMeter] = useState("");
+  const [country, setCountry] = useState("");
+  const [creditCard, setCreditCard] = useState("");
 
   const [firstPhone, setFirstPhone] = useState(true);
   const [secondPhone, setSecondPhone] = useState(true);
   const [thirdPhone, setThirdPhone] = useState(false);
   const [fourthPhone, setFourthPhone] = useState(false);
   const [btnshow, setBtnShow] = useState(true);
-  const [country, setCountry] = useState("");
+
+  const [standardChecked, setStandardChecked] = useState(false);
+  const [customChecked, setCustomChecked] = useState(true);
+  const [proVersionChecked, setProVersionChecked] = useState(false);
+
+  const handleCheckboxChange = (e) => {
+    const { name, checked } = e.target;
+    switch (name) {
+      case "standard":
+        setStandardChecked(checked);
+        setCustomChecked(false);
+        setProVersionChecked(false);
+        break;
+      case "custom":
+        setStandardChecked(false);
+        setCustomChecked(checked);
+        setProVersionChecked(false);
+        break;
+      case "proVersion":
+        setStandardChecked(false);
+        setCustomChecked(false);
+        setProVersionChecked(checked);
+        break;
+      default:
+        break;
+    }
+  };
 
   const handleBack = () => {
     navigate("/store");
@@ -82,7 +146,7 @@ export default function CreateStore() {
             >
               Сбросить
             </button>
-            <button className="w-32 h-12 rounded-xl bg-blue-500 text-white font-semibold">
+            <button onClick={handleSave} className="w-32 h-12 rounded-xl bg-blue-500 text-white font-semibold">
               Сохранить
             </button>
           </div>
@@ -117,7 +181,9 @@ export default function CreateStore() {
                     Квадратура
                   </label>
                   <input
-                    type="text"
+                    type="number"
+                    value={meter}
+                    onChange={(e)=> setMeter(e.target.value)}
                     placeholder="Введите квадратуру"
                     className={`${theme}_inp w-80 h-14 rounded-2xl px-4 outline-none`}
                   />
@@ -257,6 +323,8 @@ export default function CreateStore() {
                   </label>
                   <input
                     type="text"
+                    value={facebook}
+                    onChange={(e)=>setFacebook(e.target.value)}
                     placeholder="Название страницы"
                     className={`${theme}_inp w-80 h-14 rounded-2xl px-4 outline-none`}
                   />
@@ -267,6 +335,8 @@ export default function CreateStore() {
                   </label>
                   <input
                     type="text"
+                    value={instagram}
+                    onChange={(e)=>setInstagram(e.target.value)}
                     placeholder="@ Юзернейм"
                     className={`${theme}_inp w-80 h-14 rounded-2xl px-4 outline-none`}
                   />
@@ -277,6 +347,8 @@ export default function CreateStore() {
                   </label>
                   <input
                     type="text"
+                    value={telegram}
+                    onChange={(e)=>setTelegram(e.target.value)}
                     placeholder="@ Юзернейм"
                     className={`${theme}_inp w-80 h-14 rounded-2xl px-4 outline-none`}
                   />
@@ -287,6 +359,8 @@ export default function CreateStore() {
                   </label>
                   <input
                     type="text"
+                    value={website}
+                    onChange={(e)=>setWebsite(e.target.value)}
                     placeholder="Ссылка на сайт"
                     className={`${theme}_inp w-80 h-14 rounded-2xl px-4 outline-none`}
                   />
@@ -310,7 +384,7 @@ export default function CreateStore() {
               <div className="w-[87%] flex flex-wrap gap-x-[132px] gap-y-10 items-center">
                 <button
                   className={`relative inline-flex items-center bg-gray-100 rounded-lg w-[320px] h-14 px-1 ${theme}_inp`}
-                  onClick={() => setEnabled(!enabled)}
+                  onClick={enabledCheck}
                   role="switch"
                   aria-checked={enabled}
                 >
@@ -331,6 +405,8 @@ export default function CreateStore() {
                 <div className="flex flex-col">
                   <input
                     type="text"
+                    value={legalName}
+                    onChange={(e)=> setLegalName(e.target.value)}
                     className={`${theme}_inp w-80 h-14 rounded-2xl px-4 outline-none`}
                     placeholder="Введите название"
                   />
@@ -343,6 +419,8 @@ export default function CreateStore() {
                   </label>
                   <input
                     type="text"
+                    value={region}
+                    onChange={(e) => setRegion(e.target.value)}
                     placeholder="Город, район, улица, дом"
                     className={`${theme}_inp w-[770px] h-14 rounded-2xl px-4 outline-none`}
                   />
@@ -363,12 +441,16 @@ export default function CreateStore() {
                 </div>
                 <div className="flex flex-col">
                   <input
-                    type="text"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     placeholder="Введите почтовый индекс"
                     className={`${theme}_inp w-80 h-14 rounded-2xl px-4 outline-none`}
                   />
                 </div>
-                <div className={`flex flex-col w-[770px] h-[114px] rounded-2xl ${theme}_inp overflow-hidden`}>
+                <div
+                  className={`flex flex-col w-[770px] h-[114px] rounded-2xl ${theme}_inp overflow-hidden`}
+                >
                   <Cleave
                     placeholder="Enter your credit card"
                     options={{ creditCard: true }}
@@ -378,11 +460,74 @@ export default function CreateStore() {
                   />
                   <input
                     type="text"
+                    value={bank}
+                    onChange={(e) => setBank(e.target.value)}
                     placeholder="Название банка и филиал"
                     className={`${theme}_inp w-[770px] border-t-2 h-14  px-4 outline-none`}
                   />
                 </div>
-                <button className={`flex items-center justify-center gap-2 w-[770px] rounded-2xl h-14 ${theme}_inp`}><FaPlus /> Добавить еще один банковский счет</button>
+                <button
+                  className={`flex items-center justify-center gap-2 w-[770px] rounded-2xl h-14 ${theme}_inp`}
+                >
+                  <FaPlus /> Добавить еще один банковский счет
+                </button>
+              </div>
+            </div>
+          </div>
+          <div className="flex mt-3">
+            <div className="w-[30%]">
+              <h2 className="text-2xl font-semibold px-12 py-8">Чек</h2>
+            </div>
+            <div className="w-[70%] h-full flex flex-col py-8 gap-9">
+              <div
+                className={`w-[770px] h-2 rounded-2xl ${theme}_inp flex overflow-hidden`}
+              >
+                <div className={`h-full w-[256px] rounded-2xl transition  ${standardChecked ? "bg-blue-500" : "bg-none"}`}></div>
+                <div className={`h-full w-[256px] rounded-2xl  ${customChecked ? "bg-blue-500" : "bg-none"}`}></div>
+                <div className={`h-full w-[256px] rounded-2xl  ${proVersionChecked ? "bg-blue-500" : "bg-none"}`}></div>
+              </div>
+              <div className="flex justify-around w-[770px]">
+                <span className="flex flex-col items-center">
+                  <span className="overflow-hidden w-4 h-4 rounded-2xl flex items-center justify-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      className="w-4 h-4 cursor-pointer"
+                      name="standard"
+                      checked={standardChecked}
+                      onChange={handleCheckboxChange}
+                    />
+                  </span>
+                  <p>Стандартный</p>
+                </span>
+                <span className="flex flex-col items-center">
+                  <span className="overflow-hidden w-4 h-4 rounded-2xl flex items-center justify-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      className="w-4 h-4 cursor-pointer"
+                      name="custom"
+                      checked={customChecked}
+                      onChange={handleCheckboxChange}
+                    />
+                  </span>
+                  <p>Кастомный</p>
+                </span>
+                <span className="flex flex-col items-center">
+                  <span className="overflow-hidden w-4 h-4 rounded-2xl flex items-center justify-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      className="w-6 h-6 cursor-pointer"
+                      name="proVersion"
+                      checked={proVersionChecked}
+                      onChange={handleCheckboxChange}
+                    />
+                  </span>
+                  <p>Pro version</p>
+                </span>
+              </div>
+              <div className="flex justify-around w-[785px]">
+                <img src={Check} className="w-[250px]" alt="" />
+                <img src={Check} className="w-[250px]" alt="" />
+                <img src={Check} className="w-[250px]" alt="" />
               </div>
             </div>
           </div>

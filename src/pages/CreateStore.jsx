@@ -1,7 +1,7 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { IoIosArrowBack, IoMdCloseCircle } from "react-icons/io";
 import Cleave from "cleave.js/react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, } from "react-router-dom";
 import { weekdays } from "../components/weekData/week";
 import { ThemeContext } from "../App";
 import "cleave.js/dist/addons/cleave-phone.uz";
@@ -12,17 +12,64 @@ import { countries } from "../components/country/country";
 import Check from "../assets/Check.png";
 import { useDispatch, useSelector } from "react-redux";
 import { add } from "../components/createStoreSlicer/storeSlicer";
+import { uid } from "uid";
+import { ToastContainer, toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
+import { getStorage } from "../components/localStorage/storage";
 
 export default function CreateStore() {
 
-  const newStore = useSelector((state)=> state.addStore);
   const dispatch = useDispatch();
-
-    const handleSave = () => {
-      dispatch(add({title: title, meter: meter, phone1: phone, phone2: phone2, phone3: phone3, phone4: phone4, facebook: facebook, instagram: instagram, telegram: telegram, website: website, more: enabled, legalName: legalName, region: region, country: country, email: email, creditCard: creditCard, bankname: bank}))
-      console.log(newStore); 
+  
+  const id = uid();
+  const handleSave = () => {
+    let plan = "";
+  
+    if (standardChecked) {
+      plan = "standard";
+    } else if (customChecked) {
+      plan = "custom";
+    } else if (proVersionChecked) {
+      plan = "pro";
     }
+  
+    if (
+      title.trim() !== "" &&
+      meter.trim() !== "" &&
+      phone.trim() !== "" &&
+      telegram.trim() !== "" &&
+      instagram.trim() !== "" &&
+      region.trim() !== "" &&
+      creditCard.trim() !== "" &&
+      bank.trim() !== ""
+    ) {
+      dispatch(add({id: id,title: title, meter: meter, mondayOpen: mondayOpen, mondayClose: mondayClose, tuesdayOpen: tuesdayOpen, tuesdayClose: tuesdayClose, wednesdayOpen: wednesdayOpen, wednesdayClose: wednesdayClose, thursdayOpen: thursdayOpen, thursdayClose: thursdayClose, fridayOpen: fridayOpen, fridayClose: fridayClose, saturdayOpen: saturdayOpen, saturdayClose: saturdayClose, sundayOpen: sundayOpen, sundayClose: sundayClose, phone1: phone, phone2: phone2, phone3: phone3, phone4: phone4, facebook: facebook, instagram: instagram, telegram: telegram, website: website, more: enabled, legalName: legalName, region: region, country: country, email: email, creditCard: creditCard, bankname: bank, secondCreditCard: secondCreditCard, secondBank: secondBank, plan: plan}))
+      setSave(false)
+      setSecondSave(true)
+    }
+    else {
+      toast.error("Please fill in valid");
+    }
+  };
+  const storage = localStorage.getItem('store');
+  const newStorage = [];
+  
+  console.log(storage);
+  
+  const send = useNavigate();
+  const updatedStore = useSelector((state) => state.addStore);
+  
+  const saveLocalStorage = () => {
+    if (storage) {
+      newStorage.push(...JSON.parse(storage));
+    }
+    newStorage.push(updatedStore);
+    localStorage.setItem("store", JSON.stringify(newStorage));
+    send('/store');
+  };
+  
 
+  getStorage();
 
   const { theme } = useContext(ThemeContext);
   const navigate = useNavigate();
@@ -40,9 +87,39 @@ export default function CreateStore() {
   const [region, setRegion] = useState("");
   const [email , setEmail] = useState("");
   const [bank, setBank] = useState("");
-
-
+  const [secondBank, setSecondBank] = useState("");
   const [enabled, setEnabled] = useState(false);
+
+
+  const [save, setSave] = useState(true);
+  const [secondSave, setSecondSave] = useState(false)
+
+
+  // weekday state
+  
+  const [mondayOpen, setMondayOpen] = useState("");
+  const [mondayClose, setMondayClose] = useState("");
+  
+  const [tuesdayOpen, setTuesdayOpen] = useState(""); 
+  const [tuesdayClose, setTuesdayClose] = useState("");
+  
+  const [wednesdayOpen, setWednesdayOpen] = useState("");
+  const [wednesdayClose, setWednesdayClose] = useState("");
+  
+  const [thursdayOpen, setThursdayOpen] = useState("");
+  const [thursdayClose, setThursdayClose] = useState("");
+  
+  const [fridayOpen, setFridayOpen] = useState("");
+  const [fridayClose, setFridayClose] = useState("");
+  
+  const [saturdayOpen, setSaturdayOpen] = useState("");
+  const [saturdayClose, setSaturdayClose] = useState("");
+  
+  const [sundayOpen, setSundayOpen] = useState("");
+  const [sundayClose, setSundayClose] = useState("");
+
+  // ----------------------------------------
+
   const enabledCheck = () =>{
     setEnabled(!enabled)
     if (enabled) {
@@ -58,16 +135,32 @@ export default function CreateStore() {
   const [meter, setMeter] = useState("");
   const [country, setCountry] = useState("");
   const [creditCard, setCreditCard] = useState("");
+  const [secondCreditCard, setSecondCreditCard] = useState("");
 
   const [firstPhone, setFirstPhone] = useState(true);
   const [secondPhone, setSecondPhone] = useState(true);
   const [thirdPhone, setThirdPhone] = useState(false);
   const [fourthPhone, setFourthPhone] = useState(false);
   const [btnshow, setBtnShow] = useState(true);
+  const [secondBtnshow, setSecondBtnShow] = useState(true);
 
   const [standardChecked, setStandardChecked] = useState(false);
   const [customChecked, setCustomChecked] = useState(true);
   const [proVersionChecked, setProVersionChecked] = useState(false);
+  const [second, setSecond] = useState(false);
+  const [isButtonDisabled, setIsButtonDisabled] = useState(true);
+
+  const checkInputs = () => {
+    if (creditCard.trim() !== '' && bank.trim() !== '') {
+      setIsButtonDisabled(false);
+    } else {
+      setIsButtonDisabled(true);
+    }
+  };
+
+  useEffect(() => {
+    checkInputs();
+  }, [creditCard, bank]);
 
   const handleCheckboxChange = (e) => {
     const { name, checked } = e.target;
@@ -146,9 +239,22 @@ export default function CreateStore() {
             >
               Сбросить
             </button>
-            <button onClick={handleSave} className="w-32 h-12 rounded-xl bg-blue-500 text-white font-semibold">
-              Сохранить
-            </button>
+            {save && (
+              <button
+                onClick={handleSave}
+                className="w-32 h-12 rounded-xl bg-blue-500 text-white font-semibold"
+              >
+                Сохранить
+              </button>
+            )}
+            {secondSave && (
+              <button
+                onClick={saveLocalStorage}
+                className="w-32 h-12 rounded-xl bg-green-500 text-white font-semibold"
+              >
+                Сохранить
+              </button>
+            )}
           </div>
         </div>
         <div className="flex flex-col h-full w-full overflow-y-scroll">
@@ -183,7 +289,7 @@ export default function CreateStore() {
                   <input
                     type="number"
                     value={meter}
-                    onChange={(e)=> setMeter(e.target.value)}
+                    onChange={(e) => setMeter(e.target.value)}
                     placeholder="Введите квадратуру"
                     className={`${theme}_inp w-80 h-14 rounded-2xl px-4 outline-none`}
                   />
@@ -200,32 +306,244 @@ export default function CreateStore() {
                   >
                     {day.name}
                   </b>
-                  <span className="flex h-full items-center">
-                    <p
-                      className={`${theme}_container text-base font-semibold text-gray-400 px-8`}
-                    >
-                      Открытие:
-                    </p>
-                    <Cleave
-                      className={`${theme}_inp w-16 h-full px-1 outline-none text-lg`}
-                      options={{ time: true, timePattern: ["h", "m"] }}
-                      placeholder="XX : XX"
-                      disabled={!day.isTrue}
-                    />
-                  </span>
-                  <span className="flex h-full items-center">
-                    <p
-                      className={`${theme}_container text-base font-semibold text-gray-400 px-8`}
-                    >
-                      Закрытие:
-                    </p>
-                    <Cleave
-                      className={`${theme}_inp w-16 h-full px-1 outline-none text-lg`}
-                      options={{ time: true, timePattern: ["h", "m"] }}
-                      placeholder="XX : XX"
-                      disabled={!day.isTrue}
-                    />
-                  </span>
+                  {day.name === "Monday" && (
+                    <>
+                      <span className="flex h-full items-center">
+                        <p
+                          className={`${theme}_container text-base font-semibold text-gray-400 px-8`}
+                        >
+                          Открытие:
+                        </p>
+                        <Cleave
+                          className={`${theme}_inp w-16 h-full px-1 outline-none text-lg`}
+                          options={{ time: true, timePattern: ["h", "m"] }}
+                          value={mondayOpen}
+                          onChange={(e) => setMondayOpen(e.target.value)}
+                          placeholder="XX : XX"
+                          disabled={!day.isTrue}
+                        />
+                      </span>
+                      <span className="flex h-full items-center">
+                        <p
+                          className={`${theme}_container text-base font-semibold text-gray-400 px-8`}
+                        >
+                          Закрытие:
+                        </p>
+                        <Cleave
+                          className={`${theme}_inp w-16 h-full px-1 outline-none text-lg`}
+                          options={{ time: true, timePattern: ["h", "m"] }}
+                          placeholder="XX : XX"
+                          value={mondayClose}
+                          onChange={(e) => setMondayClose(e.target.value)}
+                          disabled={!day.isTrue}
+                        />
+                      </span>
+                    </>
+                  )}
+                  {day.name === "Tuesday" && (
+                    <>
+                      <span className="flex h-full items-center">
+                        <p
+                          className={`${theme}_container text-base font-semibold text-gray-400 px-8`}
+                        >
+                          Открытие:
+                        </p>
+                        <Cleave
+                          className={`${theme}_inp w-16 h-full px-1 outline-none text-lg`}
+                          options={{ time: true, timePattern: ["h", "m"] }}
+                          placeholder="XX : XX"
+                          value={tuesdayOpen}
+                          onChange={(e) => setTuesdayOpen(e.target.value)}
+                          disabled={!day.isTrue}
+                        />
+                      </span>
+                      <span className="flex h-full items-center">
+                        <p
+                          className={`${theme}_container text-base font-semibold text-gray-400 px-8`}
+                        >
+                          Закрытие:
+                        </p>
+                        <Cleave
+                          className={`${theme}_inp w-16 h-full px-1 outline-none text-lg`}
+                          options={{ time: true, timePattern: ["h", "m"] }}
+                          placeholder="XX : XX"
+                          value={tuesdayClose}
+                          onChange={(e) => setTuesdayClose(e.target.value)}
+                          disabled={!day.isTrue}
+                        />
+                      </span>
+                    </>
+                  )}
+                  {day.name === "Wednesday" && (
+                    <>
+                      <span className="flex h-full items-center">
+                        <p
+                          className={`${theme}_container text-base font-semibold text-gray-400 px-8`}
+                        >
+                          Открытие:
+                        </p>
+                        <Cleave
+                          className={`${theme}_inp w-16 h-full px-1 outline-none text-lg`}
+                          options={{ time: true, timePattern: ["h", "m"] }}
+                          placeholder="XX : XX"
+                          value={wednesdayOpen}
+                          onChange={(e) => setWednesdayOpen(e.target.value)}
+                          disabled={!day.isTrue}
+                        />
+                      </span>
+                      <span className="flex h-full items-center">
+                        <p
+                          className={`${theme}_container text-base font-semibold text-gray-400 px-8`}
+                        >
+                          Закрытие:
+                        </p>
+                        <Cleave
+                          className={`${theme}_inp w-16 h-full px-1 outline-none text-lg`}
+                          options={{ time: true, timePattern: ["h", "m"] }}
+                          placeholder="XX : XX"
+                          value={wednesdayClose}
+                          onChange={(e) => setWednesdayClose(e.target.value)}
+                          disabled={!day.isTrue}
+                        />
+                      </span>
+                    </>
+                  )}
+                  {day.name === "Thursday" && (
+                    <>
+                      <span className="flex h-full items-center">
+                        <p
+                          className={`${theme}_container text-base font-semibold text-gray-400 px-8`}
+                        >
+                          Открытие:
+                        </p>
+                        <Cleave
+                          className={`${theme}_inp w-16 h-full px-1 outline-none text-lg`}
+                          options={{ time: true, timePattern: ["h", "m"] }}
+                          placeholder="XX : XX"
+                          value={thursdayOpen}
+                          onChange={(e) => setThursdayOpen(e.target.value)}
+                          disabled={!day.isTrue}
+                        />
+                      </span>
+                      <span className="flex h-full items-center">
+                        <p
+                          className={`${theme}_container text-base font-semibold text-gray-400 px-8`}
+                        >
+                          Закрытие:
+                        </p>
+                        <Cleave
+                          className={`${theme}_inp w-16 h-full px-1 outline-none text-lg`}
+                          options={{ time: true, timePattern: ["h", "m"] }}
+                          placeholder="XX : XX"
+                          value={thursdayClose}
+                          onChange={(e) => setThursdayClose(e.target.value)}
+                          disabled={!day.isTrue}
+                        />
+                      </span>
+                    </>
+                  )}
+                  {day.name === "Friday" && (
+                    <>
+                      <span className="flex h-full items-center">
+                        <p
+                          className={`${theme}_container text-base font-semibold text-gray-400 px-8`}
+                        >
+                          Открытие:
+                        </p>
+                        <Cleave
+                          className={`${theme}_inp w-16 h-full px-1 outline-none text-lg`}
+                          options={{ time: true, timePattern: ["h", "m"] }}
+                          placeholder="XX : XX"
+                          value={fridayOpen}
+                          onChange={(e) => setFridayOpen(e.target.value)}
+                          disabled={!day.isTrue}
+                        />
+                      </span>
+                      <span className="flex h-full items-center">
+                        <p
+                          className={`${theme}_container text-base font-semibold text-gray-400 px-8`}
+                        >
+                          Закрытие:
+                        </p>
+                        <Cleave
+                          className={`${theme}_inp w-16 h-full px-1 outline-none text-lg`}
+                          options={{ time: true, timePattern: ["h", "m"] }}
+                          placeholder="XX : XX"
+                          value={fridayClose}
+                          onChange={(e) => setFridayClose(e.target.value)}
+                          disabled={!day.isTrue}
+                        />
+                      </span>
+                    </>
+                  )}
+                  {day.name === "Saturday" && (
+                    <>
+                      <span className="flex h-full items-center">
+                        <p
+                          className={`${theme}_container text-base font-semibold text-gray-400 px-8`}
+                        >
+                          Открытие:
+                        </p>
+                        <Cleave
+                          className={`${theme}_inp w-16 h-full px-1 outline-none text-lg`}
+                          options={{ time: true, timePattern: ["h", "m"] }}
+                          placeholder="XX : XX"
+                          value={saturdayOpen}
+                          onChange={(e) => setSaturdayOpen(e.target.value)}
+                          disabled={!day.isTrue}
+                        />
+                      </span>
+                      <span className="flex h-full items-center">
+                        <p
+                          className={`${theme}_container text-base font-semibold text-gray-400 px-8`}
+                        >
+                          Закрытие:
+                        </p>
+                        <Cleave
+                          className={`${theme}_inp w-16 h-full px-1 outline-none text-lg`}
+                          options={{ time: true, timePattern: ["h", "m"] }}
+                          placeholder="XX : XX"
+                          value={saturdayClose}
+                          onChange={(e) => setSaturdayClose(e.target.value)}
+                          disabled={!day.isTrue}
+                        />
+                      </span>
+                    </>
+                  )}
+                  {day.name === "Sunday" && (
+                    <>
+                      <span className="flex h-full items-center">
+                        <p
+                          className={`${theme}_container text-base font-semibold text-gray-400 px-8`}
+                        >
+                          Открытие:
+                        </p>
+                        <Cleave
+                          className={`${theme}_inp w-16 h-full px-1 outline-none text-lg`}
+                          options={{ time: true, timePattern: ["h", "m"] }}
+                          placeholder="XX : XX"
+                          value={sundayOpen}
+                          onChange={(e) => setSundayOpen(e.target.value)}
+                          disabled={!day.isTrue}
+                        />
+                      </span>
+                      <span className="flex h-full items-center">
+                        <p
+                          className={`${theme}_container text-base font-semibold text-gray-400 px-8`}
+                        >
+                          Закрытие:
+                        </p>
+                        <Cleave
+                          className={`${theme}_inp w-16 h-full px-1 outline-none text-lg`}
+                          options={{ time: true, timePattern: ["h", "m"] }}
+                          placeholder="XX : XX"
+                          value={sundayClose}
+                          onChange={(e) => setSundayClose(e.target.value)}
+                          disabled={!day.isTrue}
+                        />
+                      </span>
+                    </>
+                  )}
                   <button
                     className={`${
                       day.isTrue ? "bg-blue-500" : "bg-gray-200"
@@ -324,7 +642,7 @@ export default function CreateStore() {
                   <input
                     type="text"
                     value={facebook}
-                    onChange={(e)=>setFacebook(e.target.value)}
+                    onChange={(e) => setFacebook(e.target.value)}
                     placeholder="Название страницы"
                     className={`${theme}_inp w-80 h-14 rounded-2xl px-4 outline-none`}
                   />
@@ -336,7 +654,7 @@ export default function CreateStore() {
                   <input
                     type="text"
                     value={instagram}
-                    onChange={(e)=>setInstagram(e.target.value)}
+                    onChange={(e) => setInstagram(e.target.value)}
                     placeholder="@ Юзернейм"
                     className={`${theme}_inp w-80 h-14 rounded-2xl px-4 outline-none`}
                   />
@@ -348,7 +666,7 @@ export default function CreateStore() {
                   <input
                     type="text"
                     value={telegram}
-                    onChange={(e)=>setTelegram(e.target.value)}
+                    onChange={(e) => setTelegram(e.target.value)}
                     placeholder="@ Юзернейм"
                     className={`${theme}_inp w-80 h-14 rounded-2xl px-4 outline-none`}
                   />
@@ -360,7 +678,7 @@ export default function CreateStore() {
                   <input
                     type="text"
                     value={website}
-                    onChange={(e)=>setWebsite(e.target.value)}
+                    onChange={(e) => setWebsite(e.target.value)}
                     placeholder="Ссылка на сайт"
                     className={`${theme}_inp w-80 h-14 rounded-2xl px-4 outline-none`}
                   />
@@ -406,7 +724,7 @@ export default function CreateStore() {
                   <input
                     type="text"
                     value={legalName}
-                    onChange={(e)=> setLegalName(e.target.value)}
+                    onChange={(e) => setLegalName(e.target.value)}
                     className={`${theme}_inp w-80 h-14 rounded-2xl px-4 outline-none`}
                     placeholder="Введите название"
                   />
@@ -466,11 +784,41 @@ export default function CreateStore() {
                     className={`${theme}_inp w-[770px] border-t-2 h-14  px-4 outline-none`}
                   />
                 </div>
-                <button
-                  className={`flex items-center justify-center gap-2 w-[770px] rounded-2xl h-14 ${theme}_inp`}
-                >
-                  <FaPlus /> Добавить еще один банковский счет
-                </button>
+                {second && (
+                  <div
+                    className={`flex flex-col w-[770px] h-[114px] rounded-2xl ${theme}_inp overflow-hidden`}
+                  >
+                    <Cleave
+                      placeholder="Enter your credit card"
+                      options={{ creditCard: true }}
+                      onChange={(e) => setSecondCreditCard(e.target.value)}
+                      value={secondCreditCard}
+                      className={`${theme}_inp w-[770px] h-14 rounded-2xl px-4 outline-none`}
+                    />
+                    <input
+                      type="text"
+                      value={secondBank}
+                      onChange={(e) => setSecondBank(e.target.value)}
+                      placeholder="Название банка и филиал"
+                      className={`${theme}_inp w-[770px] border-t-2 h-14  px-4 outline-none`}
+                    />
+                  </div>
+                )}
+                {secondBtnshow && (
+                  <button
+                    disabled={isButtonDisabled}
+                    onClick={() => {
+                      setSecond(!second), setSecondBtnShow(!secondBtnshow);
+                    }}
+                    className={`flex items-center justify-center gap-2 w-[770px] rounded-2xl h-14 transition-all ease-in-out ${
+                      isButtonDisabled
+                        ? `${theme}_inp`
+                        : "bg-blue-500 text-white"
+                    }`}
+                  >
+                    <FaPlus /> Добавить еще один банковский счет
+                  </button>
+                )}
               </div>
             </div>
           </div>
@@ -482,9 +830,21 @@ export default function CreateStore() {
               <div
                 className={`w-[770px] h-2 rounded-2xl ${theme}_inp flex overflow-hidden`}
               >
-                <div className={`h-full w-[256px] rounded-2xl transition  ${standardChecked ? "bg-blue-500" : "bg-none"}`}></div>
-                <div className={`h-full w-[256px] rounded-2xl  ${customChecked ? "bg-blue-500" : "bg-none"}`}></div>
-                <div className={`h-full w-[256px] rounded-2xl  ${proVersionChecked ? "bg-blue-500" : "bg-none"}`}></div>
+                <div
+                  className={`h-full w-[256px] rounded-2xl transition  ${
+                    standardChecked ? "bg-blue-500" : "bg-none"
+                  }`}
+                ></div>
+                <div
+                  className={`h-full w-[256px] rounded-2xl  ${
+                    customChecked ? "bg-blue-500" : "bg-none"
+                  }`}
+                ></div>
+                <div
+                  className={`h-full w-[256px] rounded-2xl  ${
+                    proVersionChecked ? "bg-blue-500" : "bg-none"
+                  }`}
+                ></div>
               </div>
               <div className="flex justify-around w-[770px]">
                 <span className="flex flex-col items-center">
@@ -533,6 +893,7 @@ export default function CreateStore() {
           </div>
         </div>
       </div>
+      <ToastContainer />
     </>
   );
 }
